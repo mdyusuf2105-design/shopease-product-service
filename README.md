@@ -1,88 +1,68 @@
-# ShopEase Product Management Microservice
+# ShopEase – Product Management Microservice
 
-## Overview
-Independent Product Management REST API using FastAPI and Docker.
+## Project Overview
+A RESTful Product Management API developed using FastAPI.
 
 ## Technology Stack
-- Python 3.11+
+- Python 3.11
 - FastAPI
-- Pydantic
 - Uvicorn
+- Pydantic
 - Docker
+- Docker Compose
 
-## Architecture
-- Routers: API endpoints
-- Schemas: Request and response validation
-- Models: Product data structure
-- Services: Business logic
-- Config: Application settings
-- Main: FastAPI initialization
+## Features
+- Create products
+- Retrieve all products
+- Retrieve products by ID
+- Update products
+- Delete products
+- Category filtering
+- Pagination
+- Input validation
+- Error handling
+- UUID-based product identification
+- In-memory storage
+- Docker deployment
 
 ## Project Structure
-app/main.py
-app/routers/product_routes.py
-app/schemas/product_schema.py
-app/models/product_model.py
-app/services/product_service.py
-app/config/settings.py
-Dockerfile
-.dockerignore
-requirements.txt
-.env
+- app/main.py
+- app/models/product_model.py
+- app/schemas/product_schema.py
+- app/routers/product_routes.py
+- app/services/product_service.py
+- app/config/settings.py
+- Dockerfile
+- docker-compose.yml
+- requirements.txt
 
-## Installation
-python3 -m venv venv
-source venv/bin/activate
+## Run Locally
 pip install -r requirements.txt
-
-## Local Execution
 uvicorn app.main:app --reload --port 8003
 
-## Docker Build
-docker build -t shopease-product-service .
+## Run Using Docker
+docker compose up -d --build
 
-## Docker Run
-docker run -d --name shopease-product-container -p 8003:8003 shopease-product-service
+## Stop Docker
+docker compose down
+
+## API Documentation
+http://localhost:8003/docs
+
+## Health Check
+http://localhost:8003/health
 
 ## API Endpoints
 
 | Method | Endpoint | Description |
-|---|---|---|
 | POST | /api/products/ | Create product |
-| GET | /api/products/ | Get all products |
+| GET | /api/products/ | List products |
 | GET | /api/products/{product_id} | Get product |
 | PUT | /api/products/{product_id} | Update product |
 | DELETE | /api/products/{product_id} | Delete product |
-| GET | /health | Health check |
-
-## Example Product
-{
-  "name": "Wireless Mouse",
-  "description": "Wireless optical mouse",
-  "price": 799.99,
-  "stock_quantity": 50,
-  "category": "Electronics",
-  "status": "Active"
-}
-
-## Filtering and Pagination
-/api/products/?category=Electronics&skip=0&limit=10
-
-## Validation
-Product name and category are required.
-Price must be greater than zero.
-Stock must be non-negative.
-Status must be Active or Inactive.
-
-## Error Handling
-400: Invalid product ID
-404: Product not found
-422: Validation error
-500: Internal server error
 
 ## Storage
-Products are stored in an in-memory Python dictionary.
-Data resets when the application restarts.
+Products are stored in an in-memory Python dictionary. Data is not persistent after application restart.
 
-## Swagger Documentation
-http://localhost:8003/docs
+## Deployment
+The application is containerized using Docker and configured through Docker Compose.

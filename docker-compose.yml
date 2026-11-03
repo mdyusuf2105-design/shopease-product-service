@@ -1,0 +1,9 @@
+services:
+  product-service:
+    build: .
+    container_name: shopease-product-container
+    ports:
+      - "8003:8003"
+    env_file:
+      - .env
+    restart: unless-stopped
