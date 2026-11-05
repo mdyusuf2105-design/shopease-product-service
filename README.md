@@ -1,68 +1,46 @@
-# ShopEase – Product Management Microservice
+# ShopEase – Microservices-Based E-Commerce Management System
 
-## Project Overview
-A RESTful Product Management API developed using FastAPI.
+ShopEase is a microservices-based e-commerce backend project developed using Python and FastAPI.
 
-## Technology Stack
-- Python 3.11
+## Microservices
+
+### 1. Product Service
 - FastAPI
-- Uvicorn
-- Pydantic
+- Python
+- Product CRUD APIs
 - Docker
-- Docker Compose
 
-## Features
-- Create products
-- Retrieve all products
-- Retrieve products by ID
-- Update products
-- Delete products
-- Category filtering
-- Pagination
-- Input validation
-- Error handling
-- UUID-based product identification
-- In-memory storage
-- Docker deployment
+Location: `product-service/`
+
+### 2. Authentication Service
+- FastAPI
+- MySQL 8.0
+- SQLAlchemy
+- Alembic
+- JWT Authentication
+- Argon2 Password Hashing
+- Docker and Docker Compose
+
+Location: `auth-service/`
 
 ## Project Structure
-- app/main.py
-- app/models/product_model.py
-- app/schemas/product_schema.py
-- app/routers/product_routes.py
-- app/services/product_service.py
-- app/config/settings.py
-- Dockerfile
-- docker-compose.yml
-- requirements.txt
 
-## Run Locally
-pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8003
-
-## Run Using Docker
-docker compose up -d --build
-
-## Stop Docker
-docker compose down
-
-## API Documentation
-http://localhost:8003/docs
-
-## Health Check
-http://localhost:8003/health
-
-## API Endpoints
-
-| Method | Endpoint | Description |
-| POST | /api/products/ | Create product |
-| GET | /api/products/ | List products |
-| GET | /api/products/{product_id} | Get product |
-| PUT | /api/products/{product_id} | Update product |
-| DELETE | /api/products/{product_id} | Delete product |
-
-## Storage
-Products are stored in an in-memory Python dictionary. Data is not persistent after application restart.
-
-## Deployment
-The application is containerized using Docker and configured through Docker Compose.
+```text
+ShopEase/
+├── product-service/
+│   ├── app/
+│   ├── Dockerfile
+│   ├── docker-compose.yml
+│   ├── requirements.txt
+│   └── README.md
+│
+├── auth-service/
+│   ├── app/
+│   ├── alembic/
+│   ├── Dockerfile
+│   ├── docker-compose.yml
+│   ├── requirements.txt
+│   └── README.md
+│
+├── .gitignore
+└── README.md
