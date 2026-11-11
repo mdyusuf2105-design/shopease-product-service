@@ -1,135 +1,70 @@
-# ShopEase User Management Microservice
+# ShopEase User Management Service
 
-## Overview
+**Default local URL:** `http://localhost:8004`  
+**Swagger:** `http://localhost:8004/docs`
 
-An independent FastAPI microservice for managing customer profiles and delivery addresses. It integrates with the ShopEase Authentication Service using JWT authentication.
+All profile and address routes require `Authorization: Bearer <access_token>`. The token is issued by ShopEase Authentication Service. This service verifies the JWT and uses its `sub` claim as `auth_user_id`; it does not create passwords or issue login tokens.
 
-## Technology Stack
+## Profile endpoints
 
-- Python 3.11
-- FastAPI
-- MySQL 8.0
-- SQLAlchemy
-- Alembic
-- JWT
-- Pydantic
-- Docker and Docker Compose
-
-## Features
-
-- Create, retrieve, update and delete user profiles.
-- Partial profile updates.
-- Profile deactivation.
-- Create and manage multiple delivery addresses.
-- Retrieve individual addresses.
-- Set a default delivery address.
-- Ensure only one default address per profile.
-- JWT authentication using the existing Authentication Service secret.
-- User-level resource ownership protection.
-
-## Database
-
-Database: `shopease_user_db`
-
-Tables:
-- `user_profiles`
-- `user_addresses`
-
-The `auth_user_id` field identifies the user in the Authentication Service. Passwords and authentication credentials are not stored here.
-
-## Environment Variables
-
-Configure these values in `.env`:
-
-- `DATABASE_URL`
-- `JWT_SECRET_KEY`
-- `JWT_ALGORITHM`
-- `MYSQL_ROOT_PASSWORD`
-- `MYSQL_DATABASE`
-- `MYSQL_USER`
-- `MYSQL_PASSWORD`
-- `APP_NAME`
-- `APP_VERSION`
-- `APP_PORT`
-
-Use the same JWT secret and algorithm as the Authentication Service.
-
-Never commit `.env` to GitHub.
-
-## Run with Docker
-
-```bash
-docker compose up -d --build
-```
-
-Stop containers:
-
-```bash
-docker compose down
-```
-
-The named MySQL volume preserves database data.
-
-## API Documentation
-
-Base URL: `http://localhost:8004`
-
-Swagger UI: `http://localhost:8004/docs`
-
-ReDoc: `http://localhost:8004/redoc`
-
-## Profile APIs
-
-| Method | Endpoint | Description |
+| Method | Path | Purpose |
 |---|---|---|
+| GET | `/` | Service status |
+| GET | `/health` | Health response |
 | POST | `/api/users/profile` | Create profile |
-| GET | `/api/users/profile` | Get current profile |
-| PUT | `/api/users/profile` | Update profile |
+| GET | `/api/users/profile` | Get current user's profile |
+| PUT | `/api/users/profile` | Replace profile fields |
 | PATCH | `/api/users/profile` | Partially update profile |
 | DELETE | `/api/users/profile` | Delete profile |
 | PATCH | `/api/users/profile/deactivate` | Deactivate profile |
 
-## Address APIs
+Profile create/PUT body:
 
-| Method | Endpoint | Description |
+```json
+{
+  "full_name": "Example User",
+  "phone_number": "+919876543210",
+  "date_of_birth": "2000-05-21",
+  "gender": "Prefer not to say",
+  "profile_image": "https://example.com/profile.jpg"
+}
+```
+
+All fields except `full_name` are optional. Phone number, when supplied, must contain 7–15 digits, optionally prefixed by `+`.
+
+## Address endpoints
+
+| Method | Path | Purpose |
 |---|---|---|
 | POST | `/api/users/addresses` | Add address |
-| GET | `/api/users/addresses` | List addresses |
-| GET | `/api/users/addresses/{address_id}` | Get address |
-| PUT | `/api/users/addresses/{address_id}` | Update address |
+| GET | `/api/users/addresses` | List current user's addresses |
+| GET | `/api/users/addresses/{address_id}` | Get one owned address |
+| PUT | `/api/users/addresses/{address_id}` | Replace address fields |
 | PATCH | `/api/users/addresses/{address_id}` | Partially update address |
 | DELETE | `/api/users/addresses/{address_id}` | Delete address |
 | PATCH | `/api/users/addresses/{address_id}/default` | Set default address |
 
-## Authentication
+Address create/PUT body:
 
-Protected endpoints require:
-
-`Authorization: Bearer <access_token>`
-
-The token must be issued by the ShopEase Authentication Service. The User Service validates its signature and expiry using the shared JWT secret.
-
-## Database Migrations
-
-Apply existing migrations:
-
-```bash
-alembic upgrade head
+```json
+{
+  "address_type": "Home",
+  "full_name": "Example User",
+  "phone_number": "+919876543210",
+  "address_line_1": "12 Example Street",
+  "address_line_2": "Near Main Road",
+  "city": "Kumbakonam",
+  "state": "Tamil Nadu",
+  "country": "India",
+  "postal_code": "612001",
+  "is_default": true
+}
 ```
 
-Create a new migration:
+`address_type` must be `Home`, `Office` or `Other`. Address update fields are optional for PATCH. Address IDs are integers.
 
-```bash
-alembic revision --autogenerate -m "describe change"
-```
+## Ownership and default address behavior
 
-## Service Ports
+Address operations are scoped to the authenticated user's profile. The service logic clears other default flags when setting a new default address. A profile is associated with the Authentication Service account through unique `auth_user_id`.
 
-- Product Service: 8003
-- Authentication Service: 8002
-- User Management Service: 8004
-- User MySQL host port: 3308
-
-## Account Deactivation
-
-Deactivating a profile changes only the User Service profile status. It does not deactivate or delete the corresponding Authentication Service account. The two services must coordinate account status through a separately defined integration workflow.
+See the service's Docker Compose file and `.env.example` for local configuration. The user-service JWT secret and algorithm must match the Authentication Service configuration.
